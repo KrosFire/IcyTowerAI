@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icy Tower</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div>
+    <button id="startBtn">START</button>
+  </div>
+  <div id="score">Score: <span class="scoreTable"></span></div>
+  <canvas id="app"></canvas>
+  <div id="popup">
+    <h2 class="popupTitle">Game over!</h2>
+    <p> Your final score:
+      <span class="scoreTable"></span>
+    </p>
+    <button id="play">Play again!</button>
+  </div>
+
+  
+  <script src="AI/genome.js"></script>
+  <script src="AI/connHistory.js"></script>
+  <script src="AI/neuron.js"></script>
+  <script src="AI/species.js"></script>
+  <script src="AI/synapse.js"></script>
+  <script src="AI/population.js"></script>
+  <script src="game/index.js"></script>
+  <script src="game/player.js"></script>
+  <script src="engine/index.js"></script>
+  <script src="display/index.js"></script>
+  <script src="controller/index.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
