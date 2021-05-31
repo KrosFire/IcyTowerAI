@@ -30,7 +30,7 @@ class Player {
     this.score = 0;
     this.gen = 0;
 
-    this.genomeInputs = 4;
+    this.genomeInputs = 11*2+2; // 11 - platforms * 2 - x,y + 2 - velX, velY
     this.genomeOutputs = 3;
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
   }
@@ -70,6 +70,9 @@ class Player {
 
   update = () => {
     if (this.alive) {
+      this.look()
+      this.think()
+
       this.x += this.velocityX
       this.y += this.velocityY
 
@@ -79,9 +82,6 @@ class Player {
       if (Math.abs(this.velocityY) < .05) {
         this.velocityY = 0
       }
-
-      this.look()
-      this.think()
     }
   }
 
@@ -89,37 +89,54 @@ class Player {
   look() {
     this.vision = [];
     this.vision[0] = map(this.velocityY, -15, 15, -1, 1); //ai can tell its current y velocity
-    this.vision[1] = map(this.velocityX, -15, 15, -1, 1); //ai can tell its current x velocity
+    this.vision[1] = map(this.velocityX, -5, 5, -1, 1); //ai can tell its current x velocity
 
     const platforms = this.game.platforms
-    let closestPlatform
-    for (let platform of platforms) {
-      if (platform.y < this.y) {
-        closestPlatform = platform
-        break
-      }
-    }
+    // let closestPlatform
+    // for (let platform of platforms) {
+    //   if (platform.y < this.y) {
+    //     closestPlatform = platform
+    //     break
+    //   }
+    // }
 
-    if (closestPlatform === undefined) {
-      closestPlatform = platforms[platforms.length-1]
-    }
+    // if (closestPlatform === undefined) {
+    //   closestPlatform = platforms[platforms.length-1]
+    // }
 
-    const leftSide = closestPlatform.x
-    const rightSide = closestPlatform.x + closestPlatform.length
+    // const leftSide = closestPlatform.x
+    // const rightSide = closestPlatform.x + closestPlatform.length
 
-    let distanceX
-    if (this.x >= leftSide && this.x <= rightSide) {
-      distanceX = 0
-    } else if (this.x < leftSide) {
-      distanceX = leftSide - this.x
-    } else {
-      distanceX = this.x - rightSide
-    }
+    // let distanceX
+    // if (this.x >= leftSide && this.x <= rightSide) {
+    //   distanceX = 0
+    // } else if (this.x < leftSide) {
+    //   distanceX = leftSide - this.x
+    // } else {
+    //   distanceX = this.x - rightSide
+    // }
 
-    this.vision[2] = map(distanceX, 0, this.game.width - this.x, 1, 0) // Distance x to closest platform
-    this.vision[3] = map(Math.abs(closestPlatform.y-this.y), 0, this.game.height-this.y, 0, 1) // Distance y to closest platform
+    // this.vision[2] = map(distanceX, 0, this.game.width - this.x, 1, 0) // Distance x to closest platform
+    // this.vision[3] = map(Math.abs(closestPlatform.y-this.y), 0, this.game.height-this.y, 0, 1) // Distance y to closest platform
 
     // console.log("What we see: ", this.vision)
+    // ------------ ALL PLATFORMS ------------------
+    let i = this.vision.length
+    for (let platform of platforms) {
+      const leftSide = platform.x
+      const rightSide = platform.x + platform.length
+
+      let distanceX
+      if (this.x >= leftSide && this.x <= rightSide) {
+        distanceX = 0
+      } else {
+        distanceX = abs(this.x - rightSide)
+      }
+
+      this.vision[i] = map(distanceX, 0, this.game.width - this.x, 1, 0) // Distance x to closest platform
+      this.vision[i+1] = map(abs(platform.y-this.y), 0, this.game.height-this.y, 0, 1) // Distance y to closest platform
+      i += 2
+    }
   }
 
 

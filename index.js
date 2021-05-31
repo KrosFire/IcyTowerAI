@@ -23,6 +23,15 @@ const map = (n, start1, stop1, start2, stop2) => {
   return ((n-start1)/(stop1-start1))*(stop2-start2)+start2;
 };
 
+const sum = (arr) => {
+  let sum = 0
+  for (el of arr) {
+    sum += el
+  }
+
+  return sum
+}
+
 const max = Math.max
 const min = Math.min
 const pow = Math.pow
@@ -89,7 +98,7 @@ const playGame = () => {
   const game = new Game()
 
   if (generationCounter === 1) {
-    population = new Population(10000, game)
+    population = new Population(1000, game)
     game.population = population
     generationCounter++
   } else {
