@@ -18,7 +18,7 @@ class Population {
     for (var i = 0; i < size; i++) {
 
       this.players.push(new Player(game));
-      this.players[this.players.length - 1].brain.fullyConnect(this.innovationHistory)//mutate(this.innovationHistory); //fullyConnect(this.innovationHistory);
+      this.players[this.players.length - 1].brain.mutate(this.innovationHistory); //fullyConnect(this.innovationHistory);
       this.players[this.players.length - 1].brain.generateNetwork();
 
     }
@@ -84,6 +84,12 @@ class Population {
     }
   }
 
+  setNewGame(game) {
+    for (let player of this.players) {
+      player.game = game
+    }
+  }
+
   //------------------------------------------------------------------------------------------------------------------------------------------------
   //this function is called when all the players in the this.players are dead and a new this.generation needs to be made
   naturalSelection() {
@@ -98,7 +104,7 @@ class Population {
       this.massExtinctionEvent = false;
     }
     this.cullSpecies(); //kill off the bottom half of each this.species
-    this.setBestPlayer(); //save the best player of thisthis.gen
+    this.setBestPlayer(); //save the best player of this.gen
     this.killStaleSpecies(); //remove this.species which haven't improved in the last 15(ish)this.generations
     this.killBadSpecies(); //kill this.species which are so bad that they cant reproduce
 
@@ -128,7 +134,7 @@ class Population {
 
 
     this.players = [];
-    arrayCopy(children, this.players); //set the children as the current this.playersulation
+    arrayCopy(children, this.players); //set the children as the current this.player solution
     this.gen += 1;
     for (var i = 0; i < this.players.length; i++) { //generate networks for each of the children
       this.players[i].brain.generateNetwork();

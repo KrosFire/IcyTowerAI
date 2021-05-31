@@ -14,14 +14,16 @@ class Genome {
       return;
     }
 
-    for (var i = 0; i < this.inputs; i++) {
+    for (let i = 0; i < this.inputs; i++) {
       this.nodes.push(new Neuron(i));
       this.nextNode++;
       this.nodes[i].layer = 0;
     }
 
+    // for (let i = 0; i < Math.floor(this.inputs/2); i++)
+
     //create output this.nodes
-    for (var i = 0; i < this.outputs; i++) {
+    for (let i = 0; i < this.outputs; i++) {
       this.nodes.push(new Neuron(i + this.inputs));
       this.nodes[i + this.inputs].layer = 1;
       this.nextNode++;
@@ -283,7 +285,6 @@ class Genome {
   //-------------------------------------------------------------------------------------------------------------------------------
   //mutates the genome
   mutate(innovationHistory) {
-    console.log("Mutating this brain:", this)
     while (this.genes.length < 3) {
       this.addConnection(innovationHistory);
     }
@@ -296,16 +297,16 @@ class Genome {
       }
     }
 
-    //5% of the time add a new connection
+    //15% of the time add a new connection
     var rand2 = random();
-    if (rand2 < 0.05) {
+    if (rand2 < 0.15) {
 
       this.addConnection(innovationHistory);
     }
 
-    //1% of the time add a node
+    //10% of the time add a neuron
     var rand3 = random();
-    if (rand3 < 0.01) {
+    if (rand3 < 0.1) {
 
       this.addNode(innovationHistory);
     }

@@ -146,8 +146,14 @@ class Game {
               this.start = true
             }
 
-            if(this.start && platform.score > this.score) {
+            // Game score
+            if (this.start && platform.score > this.score) {
               this.score = platform.score
+            }
+
+            // Player score
+            if (this.start && platform.score > object.score) {
+              object.score = platform.score
             }
 
             return false

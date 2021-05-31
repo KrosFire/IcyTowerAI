@@ -26,8 +26,13 @@ const map = (n, start1, stop1, start2, stop2) => {
 const max = Math.max
 const min = Math.min
 const pow = Math.pow
+const abs = Math.abs
 
 let nextConnectionNo = 1000;
+
+let generationCounter = 1;
+
+let population
 
 const playGame = () => {
 
@@ -74,7 +79,7 @@ const playGame = () => {
       engine.stop()
       // displayPopup()
       console.log("Whole generation is dead")
-      // playGame()
+      playGame()
     }
   }
 
@@ -82,24 +87,33 @@ const playGame = () => {
   const controller = new Controller()
   const display = new Display(app, scoreTable)
   const game = new Game()
-  const population = new Population(1000, game)
-  console.log(population)
-  game.population = population
+
+  if (generationCounter === 1) {
+    population = new Population(10000, game)
+    game.population = population
+    generationCounter++
+  } else {
+    population.naturalSelection()
+    population.setNewGame(game)
+    game.population = population
+
+    console.log(population)
+  }
+
+
+
   const engine = new Engine(1000/30, render, update)
 
-  
-
-  console.log(game)
   display.buffer.canvas.height = game.height
   display.buffer.canvas.width = Game.width
 
   window.addEventListener("keydown", keyDownUp)
   window.addEventListener("keyup", keyDownUp)
 
-  document.getElementById("startBtn").addEventListener("click", () => {
-    console.log("START")
+  // document.getElementById("startBtn").addEventListener("click", () => {
+    // console.log("START")
     engine.start()
-  })
+  // })
 }
 
 

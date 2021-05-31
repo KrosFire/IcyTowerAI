@@ -63,7 +63,7 @@ class Neuron {
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //returns a copy of this node
   clone() {
-    var clone = new Node(this.number);
+    var clone = new Neuron(this.number);
     clone.layer = this.layer;
     return clone;
   }
