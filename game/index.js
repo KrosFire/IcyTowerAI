@@ -142,9 +142,9 @@ class Game {
             object.y = platform.y-object.height
             object.velocityY = platform.velocityY
 
-            if (!this.start && !(platform instanceof LevelPlatform) ) {
-              this.start = true
-            }
+            // if (!this.start && !(platform instanceof LevelPlatform) ) {
+            //   this.start = true
+            // }
 
             // Game score
             if (this.start && platform.score > this.score) {

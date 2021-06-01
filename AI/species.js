@@ -186,12 +186,13 @@ class Species {
     //------------------------------------------------------------------------------------------------------------------------------------------
     //kills off bottom half of the species
   cull() {
-      if (this.players.length > 2) {
-        for (var i = this.players.length / 2; i < this.players.length; i++) {
+      if (this.players.length > 4) {
+        // for (var i = floor(3*this.players.length / 4); i < this.players.length; i++) {
           // this.players.remove(i);
-          this.players.splice(i, 1);
-          i--;
-        }
+          const start = floor(3*this.players.length / 4)
+          this.players.splice(start, this.players.length-start);
+        //   i--;
+        // }
       }
     }
     //------------------------------------------------------------------------------------------------------------------------------------------

@@ -43,10 +43,32 @@ let generationCounter = 1;
 
 let population
 
+const maxStalemate = 150
+
+let jumpBias = 10
+let leftBias = 7
+let rightBias = 7
+let populationSize = 1000
+
+
 const playGame = () => {
+  let stalemate = 0
 
   const app = document.getElementById("app")
   const scoreTable = document.getElementsByClassName("scoreTable")
+  const size = document.getElementById("size")
+  const startBtn = document.getElementById("startBtn")
+
+  const jumpBiasHolder = document.getElementById("jBias")
+  const leftBiasHolder = document.getElementById("lBias")
+  const rightBiasHolder = document.getElementById("rBias")
+
+  const newRun = document.getElementById("newRun")
+
+  size.innerHTML = populationSize
+  jumpBiasHolder.innerHTML = jumpBias
+  leftBiasHolder.innerHTML = leftBias
+  rightBiasHolder.innerHTML = rightBias
 
   const keyDownUp = e => {
     controller.keyDownUp(e.type, e.keyCode)
@@ -68,26 +90,31 @@ const playGame = () => {
   }
 
   const update = time => {
+    size.innerHTML = populationSize
+    jumpBiasHolder.innerHTML = jumpBias
+    leftBiasHolder.innerHTML = leftBias
+    rightBiasHolder.innerHTML = rightBias
+
+    
+    stalemate++
+    if (stalemate >= maxStalemate && !game.start) {
+      game.start = true
+    }
+
     if (controller.stop.active) {
       engine.stop()
       console.log("STOP")
       return
     }
-    // if (controller.left.active) {
-    //   game.player.moveLeft()
-    // }
-    // if (controller.right.active) {
-    //   game.player.moveRight()
-    // }
-    // if (controller.up.active) {
-    //   game.player.jump()
-    //   controller.up.active = false
-    // }
+
+    // Change population size
+    population.size = populationSize
     
     if(game.update()) {
       engine.stop()
       // displayPopup()
       console.log("Whole generation is dead")
+      startBtn.removeEventListener("click", controlEngine)
       playGame()
     }
   }
@@ -98,7 +125,7 @@ const playGame = () => {
   const game = new Game()
 
   if (generationCounter === 1) {
-    population = new Population(1000, game)
+    population = new Population(populationSize, game)
     game.population = population
     generationCounter++
   } else {
@@ -109,8 +136,6 @@ const playGame = () => {
     console.log(population)
   }
 
-
-
   const engine = new Engine(1000/30, render, update)
 
   display.buffer.canvas.height = game.height
@@ -119,11 +144,90 @@ const playGame = () => {
   window.addEventListener("keydown", keyDownUp)
   window.addEventListener("keyup", keyDownUp)
 
-  // document.getElementById("startBtn").addEventListener("click", () => {
-    // console.log("START")
-    engine.start()
-  // })
+  engine.start()
+
+
+  const controlEngine = () => {
+    if (engine.finished) {
+      console.log("START")
+      engine.start()
+    } else {
+      console.log("STOP")
+      engine.stop()
+    }
+  } 
+
+  startBtn.addEventListener("click", controlEngine)
 }
 
 
-window.addEventListener("load", playGame) 
+window.addEventListener("load", () => {
+  const decSize = document.getElementById("decSize")
+  const incSize = document.getElementById("incSize")
+  const size = document.getElementById("size")
+  size.innerHTML = populationSize
+
+  decSize.addEventListener("click", () => {
+    populationSize -= 100
+    size.innerHTML = populationSize
+  })
+
+  incSize.addEventListener("click", () => {
+    populationSize += 100
+    size.innerHTML = populationSize
+  })
+
+  const decJumpBias = document.getElementById("decJumpBias")
+  const incJumpBias = document.getElementById("incJumpBias")
+  const jumpBiasHolder = document.getElementById("jBias")
+
+  const decLeftBias = document.getElementById("decLeftBias")
+  const incLeftBias = document.getElementById("incLeftBias")
+  const leftBiasHolder = document.getElementById("lBias")
+
+  const decRightBias = document.getElementById("decRightBias")
+  const incRightBias = document.getElementById("incRightBias")
+  const rightBiasHolder = document.getElementById("rBias")
+
+  jumpBiasHolder.innerHTML = jumpBias
+  leftBiasHolder.innerHTML = leftBias
+  rightBiasHolder.innerHTML = rightBias
+
+  decJumpBias.addEventListener("click", () => {
+    jumpBias -= 1
+    jumpBiasHolder.innerHTML = jumpBias
+  })
+
+  incJumpBias.addEventListener("click", () => {
+    jumpBias += 1
+    jumpBiasHolder.innerHTML = jumpBias
+  })
+
+
+  decLeftBias.addEventListener("click", () => {
+    leftBias -= 1
+    leftBiasHolder.innerHTML = leftBias
+  })
+
+  incLeftBias.addEventListener("click", () => {
+    leftBias += 1
+    leftBiasHolder.innerHTML = leftBias
+  })
+
+
+  decRightBias.addEventListener("click", () => {
+    rightBias -= 1
+    rightBiasHolder.innerHTML = rightBias
+  })
+
+  incRightBias.addEventListener("click", () => {
+    rightBias += 1
+    rightBiasHolder.innerHTML = rightBias
+  })
+
+  const run = document.getElementById("run").addEventListener("click", e => {
+    e.target.disabled = true
+    playGame()
+  })
+
+}) 

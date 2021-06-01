@@ -9,7 +9,34 @@
 </head>
 <body>
   <div>
-    <button id="startBtn">START</button>
+    <button id="run">RUN</button>
+  </div>
+  <div>
+    <button id="startBtn">START/STOP</button>
+  </div>
+  <div>
+    Population size:
+    <button id="decSize">-</button>
+    <span id="size"></span>
+    <button id="incSize">+</button>
+  </div>
+  <div>
+    Jump Bias:
+    <button id="decJumpBias">-</button>
+    <span id="jBias"></span>
+    <button id="incJumpBias">+</button>
+  </div>
+  <div>
+    Left Bias:
+    <button id="decLeftBias">-</button>
+    <span id="lBias"></span>
+    <button id="incLeftBias">+</button>
+  </div>
+  <div>
+    Right Bias:
+    <button id="decRightBias">-</button>
+    <span id="rBias"></span>
+    <button id="incRightBias">+</button>
   </div>
   <div id="score">Score: <span class="scoreTable"></span></div>
   <canvas id="app"></canvas>

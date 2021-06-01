@@ -9,16 +9,17 @@ class Population {
     this.innovationHistory = []; // new ArrayList<connectionHistory>();
     this.genPlayers = []; //new ArrayList<Player>();
     this.species = []; //new ArrayList<Species>();
+    this.size = size
 
     this.massExtinctionEvent = false;
     this.newStage = false;
 
     this.gensSinceNewWorld = 0;
 
-    for (var i = 0; i < size; i++) {
+    for (var i = 0; i < this.size; i++) {
 
       this.players.push(new Player(game));
-      this.players[this.players.length - 1].brain.fullyConnect(this.innovationHistory)//mutate(this.innovationHistory); //fullyConnect(this.innovationHistory);
+      this.players[this.players.length - 1].brain.mutate(this.innovationHistory)//fullyConnect(this.innovationHistory);
       this.players[this.players.length - 1].brain.generateNetwork();
 
     }
@@ -100,6 +101,7 @@ class Population {
     this.calculateFitness(); //calculate the fitness of each player
     this.sortSpecies(); //sort the this.species to be ranked in fitness order, best first
     if (this.massExtinctionEvent) {
+      console.log("MASS EXTINCTION")
       this.massExtinction();
       this.massExtinctionEvent = false;
     }
@@ -112,22 +114,21 @@ class Population {
 
     var averageSum = this.getAvgFitnessSum();
     var children = [];
-    for (var j = 0; j < this.species.length; j++) { //for each this.species
+    for (let j = 0; j < this.species.length; j++) { //for each this.species
 
       children.push(this.species[j].champ.clone()); //add champion without any mutation
       var NoOfChildren = floor(this.species[j].averageFitness / averageSum * this.players.length) - 1; //the number of children this this.species is allowed, note -1 is because the champ is already added
 
 
-      for (var i = 0; i < NoOfChildren; i++) { //get the calculated amount of children from this this.species
+      for (let i = 0; i < NoOfChildren; i++) { //get the calculated amount of children from this this.species
         children.push(this.species[j].giveMeBaby(this.innovationHistory));
       }
     }
-    // setup();
-    // return;
-    if (children.length < this.players.length) {
+
+    if (children.length < this.size) {
       children.push(previousBest.clone());
     }
-    while (children.length < this.players.length) { //if not enough babies (due to flooring the number of children to get a whole var)
+    while (children.length < this.size) { //if not enough babies (due to flooring the number of children to get a whole var)
       children.push(this.species[0].giveMeBaby(this.innovationHistory)); //get babies from the best this.species
     }
 
@@ -136,7 +137,7 @@ class Population {
     this.players = [];
     arrayCopy(children, this.players); //set the children as the current this.player solution
     this.gen += 1;
-    for (var i = 0; i < this.players.length; i++) { //generate networks for each of the children
+    for (var i = 0; i < this.size; i++) { //generate networks for each of the children
       this.players[i].brain.generateNetwork();
     }
   }
@@ -144,13 +145,15 @@ class Population {
   //------------------------------------------------------------------------------------------------------------------------------------------
   //seperate this.players into this.species based on how similar they are to the leaders of each this.species in the previous this.gen
   speciate() {
-      for (var s of this.species) { //empty this.species
+      for (let s of this.species) { //empty this.species
         s.players = [];
       }
-      for (var i = 0; i < this.players.length; i++) { //for each player
-        var speciesFound = false;
-        for (var s of this.species) { //for each this.species
-          if (s.sameSpecies(this.players[i].brain)) { //if the player is similar enough to be considered in the same this.species
+
+      console.log("We add player to species.")
+      for (let i = 0; i < this.players.length; i++) { //for each player
+        let speciesFound = false;
+        for (let s of this.species) { //for each this.species
+          if (s.players.length < 50 && s.sameSpecies(this.players[i].brain)) { //if the player is similar enough to be considered in the same this.species
             s.addToSpecies(this.players[i]); //add it to the this.species
             speciesFound = true;
             break;
@@ -160,6 +163,8 @@ class Population {
           this.species.push(new Species(this.players[i]));
         }
       }
+
+      console.log("Number of species:", this.species.length)
     }
     //------------------------------------------------------------------------------------------------------------------------------------------
     //calculates the fitness of all of the players
@@ -201,7 +206,7 @@ class Population {
     //kills all this.species which haven't improved in 15this.generations
   killStaleSpecies() {
       for (var i = 2; i < this.species.length; i++) {
-        if (this.species[i].staleness >= 15) {
+        if (this.species[i].staleness >= 20) {
           // .remove(i);
           // splice(this.species, i)
           this.species.splice(i, 1);
@@ -210,7 +215,7 @@ class Population {
       }
     }
     //------------------------------------------------------------------------------------------------------------------------------------------
-    //if a this.species sucks so much that it wont even be allocated 1 child for the nextthis.generation then kill it now
+    //if a this.species sucks so much that it wont even be allocated 1 child for the next this.generation then kill it now
   killBadSpecies() {
       var averageSum = this.getAvgFitnessSum();
 

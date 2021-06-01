@@ -7,7 +7,6 @@ class Genome {
     this.layers = 4;
     this.layerDist = []
     this.nextNode = 0;
-    // this.biasNode;
     this.network = []; //a list of the this.nodes in the order that they need to be considered in the NN
     //create input this.nodes
 
@@ -22,6 +21,22 @@ class Genome {
       this.nextNode++; 
     }
     this.layerDist[0] = this.inputs
+
+    // BIASES -------------------------------------
+    this.nodes.push(new Neuron(this.nextNode)); // jump bias node
+    this.jumpBiasNode = this.nextNode;
+    this.nodes[this.jumpBiasNode].layer = 0;
+    this.nextNode++;
+
+    this.nodes.push(new Neuron(this.nextNode)); // left bias node
+    this.leftBiasNode = this.nextNode;
+    this.nodes[this.leftBiasNode].layer = 0;
+    this.nextNode++;
+
+    this.nodes.push(new Neuron(this.nextNode)); // right bias node
+    this.rightBiasNode = this.nextNode;
+    this.nodes[this.rightBiasNode].layer = 0;
+    this.nextNode++;
 
     // HIDDEN LAYERS ----------------------------------------
     for (let i = 0; i < Math.floor(this.inputs/2); i++) {
@@ -46,11 +61,6 @@ class Genome {
     }
     this.layerDist[3] = this.outputs
 
-    this.nodes.push(new Neuron(this.nextNode)); //bias node
-    this.biasNode = this.nextNode;
-    this.nextNode++;
-    this.nodes[this.biasNode].layer = 0;
-
   }
 
 
@@ -72,10 +82,21 @@ class Genome {
 
     // Add bias to the outputs
     const prevNodes = this.nodes.length-this.outputs
-    for (let i=0; i < this.layerDist[this.layers-1]; i++) {
-      const connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.biasNode], this.nodes[prevNodes+i]);
-      this.genes.push(new Synapse(this.nodes[this.biasNode], this.nodes[prevNodes+i], random(-1, 1), connectionInnovationNumber));
-    }
+    // JUMP
+    let connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.jumpBiasNode], this.nodes[prevNodes]);
+    this.genes.push(new Synapse(this.nodes[this.jumpBiasNode], this.nodes[prevNodes], random(-1, 1), connectionInnovationNumber));
+    // LEFT
+    connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.leftBiasNode], this.nodes[prevNodes+1]);
+    this.genes.push(new Synapse(this.nodes[this.leftBiasNode], this.nodes[prevNodes+1], random(-1, 1), connectionInnovationNumber));
+    // RIGHT
+    connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.rightBiasNode], this.nodes[prevNodes+2]);
+    this.genes.push(new Synapse(this.nodes[this.rightBiasNode], this.nodes[prevNodes+2], random(-1, 1), connectionInnovationNumber));
+    
+
+    // for (let i=0; i < this.layerDist[this.layers-1]; i++) {
+    //   const connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.biasNode], this.nodes[prevNodes+i]);
+    //   this.genes.push(new Synapse(this.nodes[this.biasNode], this.nodes[prevNodes+i], random(-1, 1), connectionInnovationNumber));
+    // }
 
     //changed this so if error here
     // this.connectNodes();
@@ -116,7 +137,11 @@ class Genome {
     for (var i = 0; i < this.inputs; i++) {
       this.nodes[i].outputValue = inputValues[i];
     }
-    this.nodes[this.biasNode].outputValue = 0; //output of bias is 1
+
+    // SET BIASES
+    this.nodes[this.jumpBiasNode].outputValue = jumpBias
+    this.nodes[this.leftBiasNode].outputValue = leftBias
+    this.nodes[this.rightBiasNode].outputValue = rightBias
 
     for (var i = 0; i < this.network.length; i++) { //for each neuron in the network engage it(see neuron class for what this does)
       this.network[i].engage();
@@ -165,7 +190,7 @@ class Genome {
     }
     var randomConnection = Math.floor(random(this.genes.length));
 
-    while (this.genes[randomConnection].fromNode == this.nodes[this.biasNode] && this.genes.length != 1) { //dont disconnect bias
+    while ((this.genes[randomConnection].fromNode == this.nodes[this.jumpBiasNode] || this.genes[randomConnection].fromNode == this.nodes[this.leftBiasNode] || this.genes[randomConnection].fromNode == this.nodes[this.rightBiasNode]) && this.genes.length != 1) { //dont disconnect bias
       randomConnection = Math.floor(random(this.genes.length));
     }
 
@@ -185,9 +210,9 @@ class Genome {
     this.getNode(newNodeNo).layer = this.genes[randomConnection].fromNode.layer + 1;
 
 
-    connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.biasNode], this.getNode(newNodeNo));
-    //connect the bias to the new node with a weight of 0
-    this.genes.push(new Synapse(this.nodes[this.biasNode], this.getNode(newNodeNo), 0, connectionInnovationNumber));
+    // connectionInnovationNumber = this.getInnovationNumber(innovationHistory, this.nodes[this.biasNode], this.getNode(newNodeNo));
+    // //connect the bias to the new node with a weight of 0
+    // this.genes.push(new Synapse(this.nodes[this.biasNode], this.getNode(newNodeNo), 0, connectionInnovationNumber));
 
     //if the layer of the new node is equal to the layer of the output node of the old connection then a new layer needs to be created
     //more accurately the layer numbers of all layers equal to or greater than this new node need to be incremented
@@ -308,28 +333,28 @@ class Genome {
   //mutates the genome
   mutate(innovationHistory) {
     // console.log("MUTATION!")
-    while (this.genes.length < 3) {
+    while (this.genes.length < 2*(this.nodes.length)/3) {
       this.addConnection(innovationHistory);
     }
 
     var rand1 = random();
-    if (rand1 < 0.8) { // 80% of the time mutate weights
+    if (rand1 < 0.9) { // 90% of the time mutate weights
 
       for (var i = 0; i < this.genes.length; i++) {
         this.genes[i].mutateWeight();
       }
     }
 
-    //30% of the time add a new connection
+    //50% of the time add a new connection
     var rand2 = random();
-    if (rand2 < 0.3) {
+    if (rand2 < 0.5) {
 
       this.addConnection(innovationHistory);
     }
 
-    //10% of the time add a neuron
+    //40% of the time add a neuron
     var rand3 = random();
-    if (rand3 < 0.1) {
+    if (rand3 < 0.4) {
 
       this.addNode(innovationHistory);
     }
@@ -343,7 +368,9 @@ class Genome {
     child.nodes = [];
     child.layers = this.layers;
     child.nextNode = this.nextNode;
-    child.biasNode = this.biasNode;
+    child.jumpBiasNode = this.jumpBiasNode;
+    child.leftBiasNode = this.leftBiasNode;
+    child.rightBiasNode = this.rightBiasNode;
     var childGenes = []; // new ArrayList<Synapse>();//list of genes to be inherrited form the parents
     var isEnabled = []; // new ArrayList<Boolean>();
     //all inherited genes
@@ -406,7 +433,9 @@ class Genome {
     //prints out info about the genome to the console
   printGenome() {
     console.log("Prvar genome  layers:" + this.layers);
-    console.log("bias node: " + this.biasNode);
+    console.log("jump bias node: " + this.jumpBiasNode);
+    console.log("left bias node: " + this.leftBiasNode);
+    console.log("right bias node: " + this.rightBiasNode);
     console.log("this.nodes");
     for (var i = 0; i < this.nodes.length; i++) {
       console.log(this.nodes[i].number + ",");
@@ -438,7 +467,9 @@ class Genome {
 
       clone.layers = this.layers;
       clone.nextNode = this.nextNode;
-      clone.biasNode = this.biasNode;
+      clone.jumpBiasNode = this.jumpBiasNode;
+      clone.leftBiasNode = this.leftBiasNode;
+      clone.rightBiasNode = this.rightBiasNode;
       clone.connectNodes();
 
       return clone;
