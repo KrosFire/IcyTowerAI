@@ -74,7 +74,7 @@ class Population {
     tempBest.gen = this.gen;
 
 
-    //if best thisthis.gen is better than the global best score then set the global best as the best thisthis.gen
+    //if best this.gen is better than the global best score then set the global best as the best this.gen
 
     if (tempBest.score >= this.bestScore) {
       this.genPlayers.push(tempBest.cloneForReplay());

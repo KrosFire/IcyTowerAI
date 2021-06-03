@@ -152,7 +152,7 @@ class Game {
             }
 
             // Player score
-            if (this.start && platform.score > object.score) {
+            if (this.start && object.alive && platform.score > object.score) {
               object.score = platform.score
             }
 
