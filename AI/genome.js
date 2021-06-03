@@ -333,11 +333,11 @@ class Genome {
   //mutates the genome
   mutate(innovationHistory) {
     // console.log("MUTATION!")
-    while (this.genes.length < (this.nodes.length)/3) {
+    while (this.genes.length < (this.nodes.length)/2) {
       this.addConnection(innovationHistory);
     }
 
-    var rand1 = random();
+    var rand1 = random(1);
     if (rand1 < 0.8) { // 80% of the time mutate weights
 
       for (var i = 0; i < this.genes.length; i++) {
@@ -345,15 +345,15 @@ class Genome {
       }
     }
 
-    //15% of the time add a new connection
-    var rand2 = random();
-    if (rand2 < 0.15) {
+    //50% of the time add a new connection
+    var rand2 = random(1);
+    if (rand2 < 0.5) {
 
       this.addConnection(innovationHistory);
     }
 
     //1% of the time add a neuron
-    var rand3 = random();
+    var rand3 = random(1);
     if (rand3 < 0.01) {
 
       this.addNode(innovationHistory);

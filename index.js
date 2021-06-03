@@ -49,7 +49,7 @@ let jumpBias = 10
 let leftBias = 7
 let rightBias = 7
 let populationSize = 1000
-
+let gameSpeed = 66
 
 const playGame = () => {
   let stalemate = 0
@@ -64,6 +64,7 @@ const playGame = () => {
   const rightBiasHolder = document.getElementById("rBias")
 
   const newRun = document.getElementById("newRun")
+  const speed = document.getElementById("speed")
 
   size.innerHTML = populationSize
   jumpBiasHolder.innerHTML = jumpBias
@@ -86,6 +87,7 @@ const playGame = () => {
       display.drawRectangle(platform.x, platform.y, platform.length, platform.width, platform.color)
     }
 
+    gameStart = false
     display.render()
   }
 
@@ -94,6 +96,8 @@ const playGame = () => {
     jumpBiasHolder.innerHTML = jumpBias
     leftBiasHolder.innerHTML = leftBias
     rightBiasHolder.innerHTML = rightBias
+    engine.timeStep = 100-gameSpeed
+    speed.innerHTML = gameSpeed
 
     
     stalemate++
@@ -132,11 +136,12 @@ const playGame = () => {
     population.naturalSelection()
     population.setNewGame(game)
     game.population = population
+    generationCounter++
 
     console.log(population)
   }
 
-  const engine = new Engine(1000/30, render, update)
+  const engine = new Engine(100-gameSpeed, render, update)
 
   display.buffer.canvas.height = game.height
   display.buffer.canvas.width = Game.width
@@ -145,7 +150,6 @@ const playGame = () => {
   window.addEventListener("keyup", keyDownUp)
 
   engine.start()
-
 
   const controlEngine = () => {
     if (engine.finished) {
@@ -224,6 +228,26 @@ window.addEventListener("load", () => {
     rightBias += 1
     rightBiasHolder.innerHTML = rightBias
   })
+
+  const decSpeed = document.getElementById("decSpeed")
+  const incSpeed = document.getElementById("incSpeed")
+  const speed = document.getElementById("speed")
+
+  decSpeed.addEventListener("click", () => {
+    if (gameSpeed > 1) { 
+      gameSpeed -= 1
+    }
+    speed.innerHTML = gameSpeed
+  })
+
+  incSpeed.addEventListener("click", () => {
+    if (gameSpeed < 99) {
+      gameSpeed += 1
+    }
+    speed.innerHTML = gameSpeed
+  })
+
+  speed.innerHTML = gameSpeed
 
   const run = document.getElementById("run").addEventListener("click", e => {
     e.target.disabled = true

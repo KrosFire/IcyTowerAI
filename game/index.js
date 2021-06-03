@@ -209,26 +209,22 @@ class Game {
     }
 
     for (let player of this.population.players) {
-      // console.log("We're updating Player")
-      // Setup the next tick
-      if (!player.onPlatform) {
-        player.velocityY += this.gravity
-        player.velocityY *= this.friction
+      if (player.alive) {
+        // Setup the next tick
+        if (!player.onPlatform) {
+          player.velocityY += this.gravity
+          player.velocityY *= this.friction
+        }
+        player.velocityX *= this.friction
+
+        // Round the numbers down to .001
+        player.velocityX = Math.round(player.velocityX * 1000)/ 1000
+        player.velocityY = Math.round(player.velocityY * 1000)/ 1000
+
+        // Check collisions in next tick and act accordingly
+        this.collideObject(player)
+        player.update()
       }
-
-      player.velocityX *= this.friction
-
-      // Round the numbers down to .001
-      player.velocityX = Math.round(player.velocityX * 1000)/ 1000
-      player.velocityY = Math.round(player.velocityY * 1000)/ 1000
-
-      // Check collisions in next tick and act accordingly
-      this.collideObject(player)
-
-      // console.log("Collisions over")
-      // Update elements
-      player.update()
-      // console.log("Player has been updated")
     }
 
     // console.log("Update is finished")
